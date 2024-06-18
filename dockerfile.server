@@ -1,0 +1,16 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY pyproject.toml .
+COPY src /app/src/
+
+RUN pip install --upgrade pip
+RUN pip install minio joblib
+RUN pip3 install --no-cache-dir -e .[all]
+
+WORKDIR /app/src
+VOLUME [ "/models" ]
+EXPOSE 6060
+ENV PYTHONPATH=.
+CMD ["python", "predictor/app_cardio.py"]

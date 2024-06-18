@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  minio:
+    image: gcr.io/ml-pipeline/minio:RELEASE.2019-08-14T20-37-41Z-license-compliance
+    container_name: minio-service
+    command:
+      - server
+      - /data
+      - --address
+      - :9000
+    ports:
+      - 31975:9000
+    environment:
+      - MINIO_ACCESS_KEY=minio7777
+      - MINIO_SECRET_KEY=minio8858
+      - MINIO_STORAGE_USE_HTTPS=False
+    volumes:
+      - ./minio_data:/data
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: dockerfile.mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      - ARTIFACT_ROOT=/data/mlruns
+      - BACKEND_URI=sqlite:////data/backend.db
+    volumes:
+      - ./mlflow:/data
+  # mongodb:
+  #   image: mongodb/mongodb-community-server:latest
+  #   container_name: mongodb-service
+  #   ports:
+  #     - 27017:27017
+  #   volumes:
+  #     - ./mongodb:/data/db
+
+  flask-server:
+    build:
+      context: .
+      dockerfile: dockerfile.server
+    container_name: flask-server-api
+    depends_on:
+      - mlflow
+      - minio
+      # - mongodb
+    ports:
+      - 6060:6060
+    environment:
+      - MINIO_ACCESS_KEY=minio7777
+      - MINIO_SECRET_KEY=minio8858
+      - MINIO_ENDPOINT_URL=http://host.docker.internal:31975
+      - MODEL_REGISTRY_URI=http://host.docker.internal:5000
+      - MONGO_CLIENT_ADDRESS=mongodb://host.docker.internal:27017
+      - LOG_LEVEL=DEBUG
+  # prefect-server:
+  #   image: prefecthq/prefect:2-python3.11
+  #   container_name: prefect-server
+  #   ports:
+  #     - 4200:4200
+  #   volumes:
+  #     - ./prefect:/opt/prefect/db_mnt
+  #   command:
+  #     - prefect
+  #     - server
+  #     - start
+  #     - --host
+  #     - 0.0.0.0
+  #   environment:
+  #     - "PREFECT_API_DATABASE_CONNECTION_URL=sqlite+aiosqlite:////opt/prefect/db_mnt/prefect.db"
+  #     - PREFECT_SERVER_API_PORT=4200
+  #     - PREFECT_SERVER_ANALYTICS_ENABLED=false
+  # # Long running .serve()
+  # # This container registers directly to Prefect
+  # # as an Agent.
+  # prefect-ml-pipeline-serving:
+  #   build:
+  #     dockerfile: Dockerfile.mlpipeline
+  #   container_name: prefect-ml-pipeline-serving
+  #   command:
+  #     - python
+  #     - -m
+  #     - greenbots.pipelines.for_release.serve_full_pipeline
+  #   working_dir: / # Note this is necessary because of Prefect's checks
+  #   environment:
+  #     - PREFECT_API_URL=http://host.docker.internal:4200/api
+  #     - IVA_GX_PROJECT_ROOT_DIR=/app/gx/minio
+  #     - FSSPEC_S3_KEY=minio7777
+  #     - FSSPEC_S3_SECRET=minio8858
+  #     - FSSPEC_S3_ENDPOINT_URL=http://host.docker.internal:31975
+  #     - MLFLOW_TRACKING_URI=http://host.docker.internal:5000
+  #     - MINIO_ACCESS_KEY=minio7777
+  #     - MINIO_SECRET_KEY=minio8858
+  #     - MINIO_API_HOST=host.docker.internal:31975  
+  #     - SERVER_API_URL=http://host.docker.internal:6000/reload
+  #   depends_on:
+  #     - prefect-server
+  #     - minio

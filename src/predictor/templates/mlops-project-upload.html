@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardiovascular disease prediction - Upload request</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            width: 45%;
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .form-group select {
+            width: 45%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        /* Hide the form initially */
+        .manual-entry {
+            display: none;
+        }
+    </style>
+</head>
+ 
+<body>
+    <div class="container">
+        <h2>CVD Prediction</h2>
+        <div id="selection">
+            <label><input type="radio" name="option" value="file" checked> Upload File</label>
+            <label><input type="radio" name="option" value="manual"> Manual Entry</label>
+        </div>
+
+        <!-- Form for file upload -->
+        <form action="{{ url_for('predict') }}" method="post" class="file-upload" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".xlsx, .xls, .csv">
+            <br />
+            <br />
+            <input type="submit" value="Predict">
+        </form>
+
+        <!-- Form for manual entry -->
+        <form action="{{ url_for('predict') }}" method="post" class="manual-entry">            
+            <!-- Add other input fields for manual entry here -->
+            <br/>
+            <hr/>
+            <div class="form-group">
+                <label for="gender"><b>Gender:</b></label>
+                <select name="gender" id="gender" required>
+                    <option value="1">Male</option>
+                    <option value="2">Female</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="cholesterol"><b>Cholesterol:</b></label>
+                <select name="cholesterol" id="cholesterol" required>
+                    <option value="0">Normal</option>
+                    <option value="1">Above Normal</option>
+                    <option value="2">Well Above Normal</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="gluc"><b>Glucose:</b></label>
+                <select name="gluc" id="gluc" required>
+                    <option value="0">Normal</option>
+                    <option value="1">Above Normal</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="smoke"><b>Smoke:</b></label>
+                <select name="smoke" id="smoke" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="alco"><b>Alcohol:</b></label>
+                <select name="alco" id="alco" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="active"><b>Active:</b></label>
+                <select name="active" id="active" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="age_group"><b>Age Group:</b></label>
+                <select name="age_group" id="age_group" required>
+                    <option value="1">10-19</option>
+                    <option value="2">20-29</option>
+                    <option value="3">30-39</option>
+                    <option value="4">40-49</option>
+                    <option value="5">50-59</option>
+                    <option value="6">60-69</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="bmi"><b>Body Mass Index (BMI):</b></label>
+                <select name="bmi" id="bmi" required>
+                    <option value="0">Underweight</option>
+                    <option value="1">Normal</option>
+                    <option value="2">Overweight</option>
+                    <option value="3">Obese</option>
+                    <option value="4">Extremely Obese</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="map"><b>Mean Arterial Pressure (MAP):</b></label>
+                <select name="map" id="map" required>
+                    <option value="0">Normal</option>
+                    <option value="1">Above Normal</option>
+                    <option value="2">Stage 1 Hypertension</option>
+                    <option value="3">Stage 2 Hypertension</option>
+                    <option value="4">Hypertensive Crisis</option>
+                </select>
+            </div>
+            <br />
+            <input type="submit" value="Predict">
+        </form>
+    </div>
+
+    <script>
+        // Get references to the radio buttons and form sections
+        const fileOption = document.querySelector('input[value="file"]');
+        const manualOption = document.querySelector('input[value="manual"]');
+        const fileForm = document.querySelector('.file-upload');
+        const manualForm = document.querySelector('.manual-entry');
+
+        // Function to toggle form visibility
+        function toggleFormVisibility(isFileSelected) {
+            if (isFileSelected) {
+                fileForm.style.display = 'block';
+                manualForm.style.display = 'none';
+            } else {
+                fileForm.style.display = 'none';
+                manualForm.style.display = 'block';
+            }
+        }
+
+        // Initialize form visibility based on default selection
+        toggleFormVisibility(fileOption.checked);
+
+        // Add event listeners to the radio buttons to toggle form visibility
+        fileOption.addEventListener('change', () => {
+            toggleFormVisibility(true);
+        });
+
+        manualOption.addEventListener('change', () => {
+            toggleFormVisibility(false);
+        });
+    </script>
+</body>
+</html>

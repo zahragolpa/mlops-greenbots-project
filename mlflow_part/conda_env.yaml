@@ -1,0 +1,11 @@
+name: cvd_mlops
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - click
+      - mlflow>=2.1
+      - pandas
+      - scikit-learn

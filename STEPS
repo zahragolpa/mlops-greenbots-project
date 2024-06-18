@@ -1,0 +1,16 @@
+-- prepare environment:
+mkdir /mflow
+
+-- install:
+sudo apt install docker
+sudo apt install docker-compose
+
+-- services (from .env):
+$ docker compose up --build
+$ prefect server start
+
+-- services (browser):
+cardio app: localhost:6060
+mlflow: localhost:5000
+minio: localhost:31975
+prefect: localhost:4200

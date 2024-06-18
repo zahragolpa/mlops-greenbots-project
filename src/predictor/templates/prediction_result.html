@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardiovascular disease - Prediction Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            cursor: pointer;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .prediction {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .prediction-0 {
+            background-color: #ff8080;
+        }
+
+        .prediction-1 {
+            background-color: #80d4ff;
+        }
+
+        .filter-input {
+            padding: 8px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .back-button {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        .back-button:hover {
+            background-color: #45a049;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination-button {
+            margin: 0 5px;
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .pagination-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+ 
+<body>
+    
+    <div class="container">
+        <h2>Cardiovascular disease - Prediction Result</h2>
+        <br />
+        <a href="/" class="back-button">New Test</a>
+        <br />
+
+        <input type="text" id="filterInput" class="filter-input" placeholder="Filter by prediction...">
+        <table id="predictionTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Gender</th>
+                    <th onclick="sortTable(1)">Cholesterol</th>
+                    <th onclick="sortTable(2)">Gluc</th>
+                    <th onclick="sortTable(3)">Smoke</th>
+                    <th onclick="sortTable(4)">Alcohol</th>
+                    <th onclick="sortTable(5)">Active</th>
+                    <th onclick="sortTable(6)">Age Group</th>
+                    <th onclick="sortTable(7)">BMI</th>
+                    <th onclick="sortTable(8)">MAP</th>
+                    <th onclick="sortTable(9)">Prediction</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row, prediction in predictions %}
+                <tr>
+                    {% for value in row %}
+                    <td>{{ value }}</td>
+                    {% endfor %}
+                    <td class="prediction prediction-{{ prediction }}">{{ prediction }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="pagination">
+            <button class="pagination-button" onclick="prevPage()">Previous</button>
+            <span id="currentPage"></span> / <span id="totalPages"></span>
+            <button class="pagination-button" onclick="nextPage()">Next</button>
+        </div>
+    </div>
+
+    <script>
+        var currentPage = 1;
+        var rowsPerPage = 20; // Specify the number of rows per page
+        var table = document.getElementById("predictionTable");
+        var rows = table.getElementsByTagName("tr");
+        var totalPages = Math.ceil((rows.length - 1) / rowsPerPage); // Subtract header row
+
+        function showPage(page) {
+            var startIndex = (page - 1) * rowsPerPage + 1;
+            var endIndex = page * rowsPerPage + 1;
+            for (var i = 1; i < rows.length; i++) {
+                if (i >= startIndex && i < endIndex) {
+                    rows[i].style.display = "table-row";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+            document.getElementById("currentPage").textContent = currentPage;
+            document.getElementById("totalPages").textContent = totalPages;
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            showPage(currentPage);
+        });
+    </script>
+</body> 
+</html>

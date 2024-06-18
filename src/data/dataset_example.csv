@@ -1,0 +1,6 @@
+gender,cholesterol,gluc,smoke,alco,active,age_group,bmi,map
+0,1,0,0,0,0,5,3,5
+0,0,0,0,0,1,4,2,2
+0,0,0,0,0,0,4,2,2
+0,0,0,0,0,1,6,1,2
+1,0,0,0,0,1,5,3,4
